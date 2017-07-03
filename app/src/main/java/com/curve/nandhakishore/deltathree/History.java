@@ -6,8 +6,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class History extends AppCompatActivity {
 
@@ -34,6 +38,27 @@ public class History extends AppCompatActivity {
         list_adapter = new listAdapter(this);
         history_list.setAdapter(list_adapter);
         list_adapter.notifyDataSetChanged();
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
+
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                        final historyItem temp = PokeUtils.search_history.get(viewHolder.getAdapterPosition());
+                        final int pos = viewHolder.getAdapterPosition();
+                        PokeUtils.search_history.remove(pos);
+                        list_adapter.notifyItemRemoved(pos);
+                        dbData.removeRow(temp);
+                    }
+                };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(history_list);
 
     }
 
