@@ -9,11 +9,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class PokeUtils {
 
     public static boolean found;
+
+    public static int id;
+
+    public static ArrayList<historyItem> search_history;
 
     public static String pokeUrl;
 

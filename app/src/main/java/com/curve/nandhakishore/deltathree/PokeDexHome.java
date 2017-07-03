@@ -1,11 +1,17 @@
 package com.curve.nandhakishore.deltathree;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -15,8 +21,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
+import java.util.ArrayList;
 
 public class PokeDexHome extends AppCompatActivity {
 
@@ -28,6 +34,8 @@ public class PokeDexHome extends AppCompatActivity {
     String pokeName;
     CardView card;
     RelativeLayout rl, error;
+    Toolbar toolbar;
+    databaseManage dbData = new databaseManage(this);
     Button searchButton;
     boolean found = false;
 
@@ -37,8 +45,16 @@ public class PokeDexHome extends AppCompatActivity {
         setContentView(R.layout.poke_dex_home);
 
         searchText = (EditText) findViewById(R.id.pokeName);
+        toolbar = (Toolbar) findViewById(R.id.tBar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
         searchButton = (Button) findViewById(R.id.search_button);
         initCard();
+
+        PokeUtils.id = getSharedPreferences("MyPrefs", MODE_PRIVATE).getInt("id", 0);
+        PokeUtils.search_history = new ArrayList<>();
+        dbData.open();
+        PokeUtils.search_history = dbData.getData();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +81,21 @@ public class PokeDexHome extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_history) {
+            Intent viewHistory = new Intent(getApplicationContext(), History.class);
+            startActivity(viewHistory);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private class findPokemon extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -81,8 +112,17 @@ public class PokeDexHome extends AppCompatActivity {
         protected Void doInBackground(Void... arg0) {
             String url = "http://pokeapi.co/api/v2/pokemon/";
             found = PokeUtils.searchPoke(url, pokeName);
-            if(found)
+            if(found) {
                 required = PokeUtils.getPokeInfo(getApplicationContext());
+                PokeUtils.search_history.add(new historyItem(PokeUtils.id, required.sprite, required.name));
+                dbData.addRow(new historyItem(PokeUtils.id, required.sprite, required.name));
+                PokeUtils.id++;
+            }
+            else {
+                PokeUtils.search_history.add(new historyItem(PokeUtils.id, null, pokeName));
+                dbData.addRow(new historyItem(PokeUtils.id, null, pokeName));
+                PokeUtils.id++;
+            }
             return null;
         }
 
@@ -94,8 +134,9 @@ public class PokeDexHome extends AppCompatActivity {
                 createEntry(required);
                 rl.setVisibility(View.VISIBLE);
             }
-            else
+            else {
                 error.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -149,6 +190,21 @@ public class PokeDexHome extends AppCompatActivity {
         rl = (RelativeLayout) findViewById(R.id.card);
         card = (CardView) findViewById(R.id.cv);
         error = (RelativeLayout) findViewById(R.id.no_poke);
+    }
+
+    @Override
+    protected void onStop() {
+        SharedPreferences sPrefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sPrefs.edit();
+        editor.putInt("id", PokeUtils.id);
+        editor.apply();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbData.close();
+        super.onDestroy();
     }
 }
 
