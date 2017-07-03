@@ -114,11 +114,23 @@ public class PokeDexHome extends AppCompatActivity {
             found = PokeUtils.searchPoke(url, pokeName);
             if(found) {
                 required = PokeUtils.getPokeInfo(getApplicationContext());
-                PokeUtils.search_history.add(new historyItem(PokeUtils.id, required.sprite, required.name));
-                dbData.addRow(new historyItem(PokeUtils.id, required.sprite, required.name));
+                if(PokeUtils.search_history.isEmpty()) {
+                    PokeUtils.search_history.add(new historyItem(PokeUtils.id, required.sprite, required.name));
+                    dbData.addRow(new historyItem(PokeUtils.id, required.sprite, required.name));
+                    PokeUtils.id++;
+                }
+                else if(!required.name.equalsIgnoreCase(PokeUtils.search_history.get(PokeUtils.search_history.size()-1).name)) {
+                    PokeUtils.search_history.add(new historyItem(PokeUtils.id, required.sprite, required.name));
+                    dbData.addRow(new historyItem(PokeUtils.id, required.sprite, required.name));
+                    PokeUtils.id++;
+                }
+            }
+            else if(PokeUtils.search_history.isEmpty()) {
+                PokeUtils.search_history.add(new historyItem(PokeUtils.id, null, pokeName));
+                dbData.addRow(new historyItem(PokeUtils.id, null, pokeName));
                 PokeUtils.id++;
             }
-            else {
+            else if(!pokeName.equalsIgnoreCase(PokeUtils.search_history.get(PokeUtils.search_history.size()-1).name)) {
                 PokeUtils.search_history.add(new historyItem(PokeUtils.id, null, pokeName));
                 dbData.addRow(new historyItem(PokeUtils.id, null, pokeName));
                 PokeUtils.id++;

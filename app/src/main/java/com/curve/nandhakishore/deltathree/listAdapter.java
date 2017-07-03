@@ -40,8 +40,8 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.cardHolder> {
     @Override
     public void onBindViewHolder(final cardHolder holder, final int position) {
 
-        holder.cName.setText(PokeUtils.search_history.get(position).name);
-        URL url = PokeUtils.search_history.get(position).image;
+        holder.cName.setText(PokeUtils.search_history.get(PokeUtils.search_history.size()-position-1).name);
+        URL url = PokeUtils.search_history.get(PokeUtils.search_history.size()-position-1).image;
 
         if(url != null)
             Glide.with(myContext).load(url).into(holder.cImage);

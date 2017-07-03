@@ -32,7 +32,7 @@ public class History extends AppCompatActivity {
         toolbar.setTitle("History");
 
         history_list = (RecyclerView) findViewById(R.id.history_list);
-        list_manager = new LinearLayoutManager(this);
+        list_manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         history_list.setLayoutManager(list_manager);
 
         list_adapter = new listAdapter(this);
