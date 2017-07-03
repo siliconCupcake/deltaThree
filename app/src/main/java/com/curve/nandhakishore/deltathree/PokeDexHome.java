@@ -1,14 +1,18 @@
 package com.curve.nandhakishore.deltathree;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +33,7 @@ public class PokeDexHome extends AppCompatActivity {
     EditText searchText;
     ProgressBar pBar;
     Pokemon required;
-    customTextView name, types, abilities, speed, xp, hp, attack, defense, height, weight;
+    customTextView name, types, abilities, speed, xp, hp, attack, defense, height, weight, errorMessage;
     ImageView sprite;
     String pokeName;
     CardView card;
@@ -60,7 +64,14 @@ public class PokeDexHome extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(searchText.getText()))
-                    new findPokemon().execute();
+                    if(isNetworkAvailable())
+                        new findPokemon().execute();
+                    else {
+                        errorMessage.setText("No internet connection available");
+                        card.setVisibility(View.VISIBLE);
+                        rl.setVisibility(View.GONE);
+                        error.setVisibility(View.VISIBLE);
+                    }
                 else
                     Toast.makeText(getApplicationContext(), "The text field is blank", Toast.LENGTH_SHORT).show();
             }
@@ -71,7 +82,14 @@ public class PokeDexHome extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_SEARCH){
                     if (!TextUtils.isEmpty(searchText.getText()))
-                        new findPokemon().execute();
+                        if(isNetworkAvailable())
+                            new findPokemon().execute();
+                        else {
+                            errorMessage.setText("No internet connection available");
+                            card.setVisibility(View.VISIBLE);
+                            rl.setVisibility(View.GONE);
+                            error.setVisibility(View.VISIBLE);
+                        }
                     else
                         Toast.makeText(getApplicationContext(), "The text field is blank", Toast.LENGTH_SHORT).show();
                     return true;
@@ -147,6 +165,7 @@ public class PokeDexHome extends AppCompatActivity {
                 rl.setVisibility(View.VISIBLE);
             }
             else {
+                errorMessage.setText("No such pokemon found");
                 error.setVisibility(View.VISIBLE);
             }
         }
@@ -202,6 +221,15 @@ public class PokeDexHome extends AppCompatActivity {
         rl = (RelativeLayout) findViewById(R.id.card);
         card = (CardView) findViewById(R.id.cv);
         error = (RelativeLayout) findViewById(R.id.no_poke);
+        errorMessage = (customTextView) findViewById(R.id.e_msg);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        Log.e("NETWORK", String.valueOf(activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting()));
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
     @Override

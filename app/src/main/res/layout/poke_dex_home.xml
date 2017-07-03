@@ -64,7 +64,7 @@
                 android:layout_margin="30dp"
                 android:layout_gravity="center"
                 android:id="@+id/p_bar"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -73,21 +73,24 @@
                 android:id="@+id/no_poke"
                 android:layout_marginBottom="15dp">
 
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_margin="5dp"
-                android:layout_centerInParent="true"
-                android:id="@+id/error_ic"
-                android:src="@drawable/ic_action_name"/>
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_margin="5dp"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/error_ic"
+                    android:src="@drawable/ic_action_name" />
 
-            <com.curve.nandhakishore.deltathree.customTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No such pokemon found"
-                android:textSize="35sp"
-                android:layout_below="@id/error_ic"
-                app:customFont="arcadepix_plus.ttf"/>
+                <com.curve.nandhakishore.deltathree.customTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No such pokemon found"
+                    android:id="@+id/e_msg"
+                    android:textSize="35sp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_below="@id/error_ic"
+                    app:customFont="arcadepix_plus.ttf" />
 
             </RelativeLayout>
 
